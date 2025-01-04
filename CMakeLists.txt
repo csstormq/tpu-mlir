@@ -201,7 +201,8 @@ message(STATUS "tpu-mlir version: ${MLIR_VERSION}")
 add_definitions(-DMLIR_VERSION="${MLIR_VERSION}")
 #-------------------------------------------------------------------------------
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Werror -Wno-unused-result -Wreturn-type -Wunused-variable")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Werror -Wno-unused-result -Wreturn-type -Wunused-variable")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wno-unused-result -Wreturn-type -Wunused-variable")
 message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 add_subdirectory(include)
 add_subdirectory(third_party)

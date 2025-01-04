@@ -114,7 +114,7 @@ void moveUnaryPermute(tpu::PermuteOp &op, Operation *nextOp,
   auto outputDtype = module::getElementType(output);
 
   // input -> unary
-  rewriter.updateRootInPlace(nextOp, [&] {
+  rewriter.modifyOpInPlace(nextOp, [&] {
     nextOp->setOperand(0, input);
 
     auto newType =
@@ -133,7 +133,7 @@ void moveUnaryPermute(tpu::PermuteOp &op, Operation *nextOp,
   rewriter.replaceAllUsesWith(nextOp->getResult(0), op->getResult(0));
 
   // permute -> output
-  rewriter.updateRootInPlace(op, [&] {
+  rewriter.modifyOpInPlace(op, [&] {
     op->setOperand(0, nextOp->getOpResult(0));
     if (newPermuteShape) {
     }
@@ -235,7 +235,7 @@ PermuteReorderPattern::matchAndRewriteImpl(tpu::PermuteOp op,
     // replace all uses of next to perm
     rewriter.replaceAllUsesWith(nextOp->getResult(0), op->getResult(0));
 
-    rewriter.updateRootInPlace(op, [&] {
+    rewriter.modifyOpInPlace(op, [&] {
       op->setOperand(0, nextOp->getOpResult(0));
       // linear IR, tweak order
       op->moveAfter(nextOp);

@@ -1,8 +1,8 @@
 #include "Passes.h"
+#include "mlir/Analysis/TopologicalSortUtils.h"
 #include "mlir/Dialect/Tensor/Transforms/Transforms.h"
 #include "mlir/IR/Dominance.h"
 #include "mlir/IR/Iterators.h"
-#include "mlir/Transforms/TopologicalSortUtils.h"
 namespace mlir {
 
 #define DEBUG_TYPE "fusion-of-tensor-ops"

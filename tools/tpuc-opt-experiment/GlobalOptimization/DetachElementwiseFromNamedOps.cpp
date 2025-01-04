@@ -11,13 +11,13 @@ struct DetachElementwisePattern
         !isa<linalg::ConvolutionOpInterface>(*linalgOp)) {
       return failure();
     }
-    if (!linalgOp.hasTensorSemantics())
+    if (!linalgOp.hasPureTensorSemantics())
       return failure();
 
     // Nothing to do if the output tensor operand is already a fill op.
-    OpOperandVector outputOperands;
-    if (!linalgOp.hasBufferSemantics()) {
-      outputOperands = linalgOp.getDpsInitOperands();
+    SmallVector<OpOperand *> outputOperands;
+    if (!linalgOp.hasPureBufferSemantics()) {
+      outputOperands = linalgOp.getDpsInputOperands();
     }
     // Right now all the cases we see have one output. This can be relaxed once
     // we see multiple output ops.
@@ -49,8 +49,8 @@ struct DetachElementwisePattern
         rewriter.create<linalg::FillOp>(loc, zero, initOp.getResult()).result();
 
     // Update the contraction op to use the new zero tensor as output operand.
-    rewriter.updateRootInPlace(linalgOp,
-                               [&]() { linalgOp.setDpsInitOperand(0, fill); });
+    rewriter.modifyOpInPlace(linalgOp,
+                             [&]() { linalgOp.setDpsInitOperand(0, fill); });
 
     auto outputMap = mlir::compressUnusedDims(
         linalgOp.getMatchingIndexingMap(outputOperands.front()));
@@ -106,7 +106,7 @@ struct DetachSplatConstantOutsOperands
     }
     bool madeChanges = false;
     for (auto outOperand :
-         llvm::enumerate(dpsInterfaceOp.getDpsInitOperands())) {
+         llvm::enumerate(dpsInterfaceOp.getDpsInputOperands())) {
       auto constOp =
           outOperand.value()->get().template getDefiningOp<arith::ConstantOp>();
       if (!constOp)
@@ -140,7 +140,7 @@ struct DetachSplatConstantOutsOperands
                          .create<linalg::FillOp>(
                              loc, resultType, scalarConstantOp, emptyTensorOp)
                          .getResult(0);
-      rewriter.updateRootInPlace(dpsInterfaceOp, [&]() {
+      rewriter.modifyOpInPlace(dpsInterfaceOp, [&]() {
         dpsInterfaceOp.setDpsInitOperand(outOperand.index(), fillOp);
       });
       madeChanges = true;

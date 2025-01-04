@@ -1,8 +1,8 @@
 #include "Passes.h"
+#include "mlir/Analysis/TopologicalSortUtils.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/Iterators.h"
-#include "mlir/Transforms/TopologicalSortUtils.h"
 #include <functional>
 #include <iostream>
 #include <vector>

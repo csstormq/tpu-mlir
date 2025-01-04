@@ -318,7 +318,7 @@ struct ReshapeMovePattern : public OpRewriterPatternEx<ReshapeOp> {
     auto inputShape = module::getShape(input);
     auto outputType = nextOp->getResult(0).getType();
     // input -> next
-    rewriter.updateRootInPlace(nextOp, [&] {
+    rewriter.modifyOpInPlace(nextOp, [&] {
       nextOp->setOperands(input);
       // should be the same type as the input
       module::setShape(nextOp->getResult(0), inputShape);
@@ -331,7 +331,7 @@ struct ReshapeMovePattern : public OpRewriterPatternEx<ReshapeOp> {
     // replace all uses of next to perm
     rewriter.replaceAllUsesWith(nextOp->getResult(0), op->getResult(0));
     // next -> perm
-    rewriter.updateRootInPlace(op, [&] {
+    rewriter.modifyOpInPlace(op, [&] {
       std::vector<Value> operands;
       operands.push_back(nextOp->getResult(0));
       if (op.getShapeT()) {
@@ -664,7 +664,8 @@ struct Reshape4Depth2SpacePattern : public OpRewriterPatternEx<ReshapeOp> {
     if (input_shape_pre.size() + 1 == output_shape.size()) {
       // update the output shape of first reshape
       module::setShape(pre_reshape_op->getResult(0), new_out_shape_pre_reshape);
-      pre_reshape_op.setShapeAttr(rewriter.getI64ArrayAttr(new_out_shape_pre_reshape));
+      pre_reshape_op.setShapeAttr(
+          rewriter.getI64ArrayAttr(new_out_shape_pre_reshape));
       rewriter.replaceOpWithNewOp<Depth2SpaceOp>(
           op, depth2space_output_type, ValueRange{pre_reshape_op.getOutput()},
           attrs);

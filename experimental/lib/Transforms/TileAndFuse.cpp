@@ -14,6 +14,7 @@
 #include "mlir/Dialect/SCF/IR/SCF.h"
 #include "mlir/Dialect/SCF/Transforms/TileUsingInterface.h"
 #include "mlir/Dialect/Tensor/IR/TensorTilingInterfaceImpl.h"
+#include "mlir/Dialect/Utils/StaticValueUtils.h"
 #include "mlir/Pass/Pass.h"
 #include "mlir/Pass/PassRegistry.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
@@ -45,10 +46,12 @@ struct TileConsumerAndFuseProducersGreedilyUsingSCFForOp
     }
 
     scf::SCFTileAndFuseOptions tileAndFuseOptions;
-    tileAndFuseOptions.tilingOptions.setTileSizes(attr.asArrayRef());
+    SmallVector<OpFoldResult> tileSizesOfr =
+        getAsIndexOpFoldResult(op->getContext(), attr.asArrayRef());
+    tileAndFuseOptions.tilingOptions.setTileSizes(tileSizesOfr);
 
     FailureOr<scf::SCFTileAndFuseResult> tileAndFuseResult =
-        scf::tileConsumerAndFuseProducerGreedilyUsingSCFForOp(
+        scf::tileConsumerAndFuseProducersUsingSCF(
             rewriter, op, tileAndFuseOptions);
 
     if (failed(tileAndFuseResult)) {

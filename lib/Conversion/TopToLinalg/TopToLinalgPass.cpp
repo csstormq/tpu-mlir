@@ -62,7 +62,7 @@ struct ModifyFuncOp : public OpRewritePattern<mlir::func::FuncOp> {
     //op.setFunctionType(new_funcType);
     //rewriter.replaceOpWithNewOp<mlir::func::FuncOp>(op, sym_name,
     //                  new_funcType, sym_visi, arg_attr, res_attr);
-    rewriter.updateRootInPlace(op, [&](){op.setFunctionType(new_funcType);
+    rewriter.modifyOpInPlace(op, [&](){op.setFunctionType(new_funcType);
                                          op->setOperands(new_operands); });
     apply_time += 1;
     return success();
