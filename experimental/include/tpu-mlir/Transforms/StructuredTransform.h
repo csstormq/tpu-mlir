@@ -301,28 +301,28 @@ private:
 
 // remove this code when we upgrade llvm to
 // (1609f1c2a5ecc0e0e28f433ec9205122478ddaa3)
-namespace llvm {
-/// Add support for llvm style casts. We provide a cast between To and From if
-/// From is mlir::AffineExpr or derives from it.
-template <typename To, typename From>
-struct CastInfo<To, From,
-                std::enable_if_t<std::is_same_v<mlir::AffineExpr,
-                                                std::remove_const_t<From>> ||
-                                 std::is_base_of_v<mlir::AffineExpr, From>>>
-    : NullableValueCastFailed<To>,
-      DefaultDoCastIfPossible<To, From, CastInfo<To, From>> {
+// namespace llvm {
+// /// Add support for llvm style casts. We provide a cast between To and From if
+// /// From is mlir::AffineExpr or derives from it.
+// template <typename To, typename From>
+// struct CastInfo<To, From,
+//                 std::enable_if_t<std::is_same_v<mlir::AffineExpr,
+//                                                 std::remove_const_t<From>> ||
+//                                  std::is_base_of_v<mlir::AffineExpr, From>>>
+//     : NullableValueCastFailed<To>,
+//       DefaultDoCastIfPossible<To, From, CastInfo<To, From>> {
 
-  static inline bool isPossible(mlir::AffineExpr expr) {
-    /// Return a constant true instead of a dynamic true when casting to self or
-    /// up the hierarchy.
-    if constexpr (std::is_base_of_v<To, From>) {
-      return true;
-    } else {
-      return expr.isa<To>();
-    }
-  }
-  static inline To doCast(mlir::AffineExpr expr) {
-    return To((mlir::AffineExpr::ImplType *)(expr.getAsOpaquePointer()));
-  }
-};
-} // namespace llvm
+//   static inline bool isPossible(mlir::AffineExpr expr) {
+//     /// Return a constant true instead of a dynamic true when casting to self or
+//     /// up the hierarchy.
+//     if constexpr (std::is_base_of_v<To, From>) {
+//       return true;
+//     } else {
+//       return expr.isa<To>();
+//     }
+//   }
+//   static inline To doCast(mlir::AffineExpr expr) {
+//     return To((mlir::AffineExpr::ImplType *)(expr.getAsOpaquePointer()));
+//   }
+// };
+// } // namespace llvm

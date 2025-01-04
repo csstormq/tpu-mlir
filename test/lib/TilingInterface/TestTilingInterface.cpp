@@ -22,6 +22,7 @@
 #include "mlir/Dialect/SCF/Transforms/TileUsingInterface.h"
 #include "mlir/Dialect/Tensor/IR/Tensor.h"
 #include "mlir/Dialect/Tensor/IR/TensorTilingInterfaceImpl.h"
+#include "mlir/Dialect/Utils/StaticValueUtils.h"
 #include "mlir/Interfaces/TilingInterface.h"
 #include "mlir/Pass/Pass.h"
 #include "mlir/Pass/PassManager.h"
@@ -118,8 +119,7 @@ struct TestTileConsumerAndFuseProducersGreedilyUsingSCFForOp
       return failure();
 
     FailureOr<scf::SCFTileAndFuseResult> tileAndFuseResult =
-        scf::tileConsumerAndFuseProducerGreedilyUsingSCFForOp(rewriter, op,
-                                                              options);
+        scf::tileConsumerAndFuseProducersUsingSCF(rewriter, op, options);
     if (failed(tileAndFuseResult)) {
       return failure();
     }
@@ -176,7 +176,7 @@ private:
 static void addPatternForTileAndFuse(MLIRContext *context,
                                      RewritePatternSet &patterns,
                                      StringRef filterName,
-                                     ArrayRef<int64_t> tileSizes,
+                                     ArrayRef<OpFoldResult> tileSizes,
                                      ArrayRef<int64_t> interchange = {}) {
   scf::SCFTileAndFuseOptions tileAndFuseOptions;
   tileAndFuseOptions.tilingOptions.setTileSizes(tileSizes).setInterchange(
@@ -191,7 +191,9 @@ void TestTilingInterfacePass::addTestPatterns(MLIRContext *context,
                                               RewritePatternSet &patterns) {
   if (testTileConsumerAndFuseProducer.hasValue()) {
     SmallVector<int64_t> tileSizes(*testTileConsumerAndFuseProducer);
-    addPatternForTileAndFuse(context, patterns, "root", tileSizes);
+    SmallVector<OpFoldResult> tileSizesOfr =
+        getAsIndexOpFoldResult(context, tileSizes);
+    addPatternForTileAndFuse(context, patterns, "root", tileSizesOfr);
     return;
   }
 }

@@ -49,11 +49,12 @@ cmake -G Ninja \
   -DCMAKE_C_COMPILER=clang \
   -DCMAKE_CXX_COMPILER=clang++ \
   -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
-  -DCMAKE_CXX_FLAGS="${CXX_FLAGS}" \
+  -DCMAKE_CXX_FLAGS="${CXX_FLAGS} -Wno-error=deprecated-declarations" \
   -DTPUMLIR_USE_LLD=ON \
   -DTPUMLIR_INCLUDE_TESTS=ON \
   -DTPUMLIR_USE_CUDA="${USE_CUDA}" \
   -DCMAKE_INSTALL_PREFIX="${INSTALL_PATH}" \
+  -DLLVM_COMPILER_IS_GCC_COMPATIBLE=OFF \
   "${PROJECT_ROOT}"
 
 cpu_num=$(cat /proc/stat | grep cpu[0-9] -c)

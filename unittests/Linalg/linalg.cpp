@@ -595,9 +595,9 @@ func.func @conv_tensors_static(%input: tensor<4x225x225x3xf32>, %filter: tensor<
     scf::SCFTileAndFuseOptions tileAndFuseOptions;
     tileAndFuseOptions.tilingOptions.setTileSizes({2, 16, 0, 0}); //.setInterchange(interchange);
 
-    FailureOr<scf::SCFTileAndFuseResult> tileAndFuseResult = scf::tileConsumerAndFuseProducerGreedilyUsingSCFForOp(
-        rewriter, tileif,
-        tileAndFuseOptions);
+    FailureOr<scf::SCFTileAndFuseResult> tileAndFuseResult =
+        scf::tileConsumerAndFuseProducersUsingSCF(rewriter, tileif,
+                                                  tileAndFuseOptions);
     if (failed(tileAndFuseResult)) {
       printf("tileAndFuseResult fail\n");
       continue;

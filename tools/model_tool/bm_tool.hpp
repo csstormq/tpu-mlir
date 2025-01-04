@@ -57,7 +57,7 @@ void bm_print(const string &filename) {
     FATAL("parse schema failed");
   }
 
-  if (true != GenerateText(parser, model_ctx.data(), &json_text)) {
+  if (!GenerateText(parser, model_ctx.data(), &json_text)) {
     FATAL("generate text failed");
   }
   cout << json_text << endl;

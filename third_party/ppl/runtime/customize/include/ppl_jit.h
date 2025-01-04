@@ -16,6 +16,7 @@
 #include <string_view>
 #include <utility>
 #include <vector>
+#include <unordered_map>
 
 enum PplErrorCode_t {
   PplLocalAddrAssignErr = 0x11,

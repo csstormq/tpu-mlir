@@ -101,49 +101,34 @@ RunMode getRunMode(Operation *op) {
   return getRunMode(funcOp);
 }
 
-void IfOp::getSuccessorRegions(std::optional<unsigned> index,
-                               ArrayRef<Attribute> operands,
+void IfOp::getSuccessorRegions(RegionBranchPoint point,
                                SmallVectorImpl<RegionSuccessor> &regions) {
   // The `then` and the `else` region branch back to the parent operation.
-  if (index) {
+  if (!point.isParent()) {
     regions.push_back(RegionSuccessor(getResults()));
     return;
   }
 
+  regions.push_back(RegionSuccessor(&getThenBranch()));
+
   // Don't consider the else region if it is empty.
   Region *elseRegion = &this->getElseBranch();
   if (elseRegion->empty())
-    elseRegion = nullptr;
-
-  // Otherwise, the successor is dependent on the condition.
-  bool condition;
-  if (auto condAttr = operands.front().dyn_cast_or_null<IntegerAttr>()) {
-    condition = condAttr.getValue().isOne();
-  } else {
-    // If the condition isn't constant, both regions may be executed.
-    regions.push_back(RegionSuccessor(&getThenBranch()));
-    // If the else region does not exist, it is not a viable successor.
-    if (elseRegion)
-      regions.push_back(RegionSuccessor(elseRegion));
-    return;
-  }
-
-  // Add the successor regions using the condition.
-  regions.push_back(RegionSuccessor(condition ? &getThenBranch() : elseRegion));
+    regions.push_back(RegionSuccessor());
+  else
+    regions.push_back(RegionSuccessor(elseRegion));
 }
 
-void LoopOp::getSuccessorRegions(std::optional<unsigned> index,
-                                 ArrayRef<Attribute> operands,
+void LoopOp::getSuccessorRegions(RegionBranchPoint point,
                                  SmallVectorImpl<RegionSuccessor> &regions) {
   // If the predecessor is the ForOp, branch into the body using the iterator
   // arguments.
-  if (!index) {
+  if (point.isParent()) {
     regions.push_back(RegionSuccessor(&getBody()));
     return;
   }
 
   // Otherwise, the loop may branch back to itself or the parent operation.
-  assert(*index == 0 && "expected loop region");
   regions.push_back(RegionSuccessor(&getBody()));
   regions.push_back(RegionSuccessor(getVFinalAndScanOutputs()));
 }

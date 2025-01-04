@@ -39,8 +39,7 @@ struct CollapseDimsPass
   void runOnOperation() override {
     RewritePatternSet patterns(&getContext());
 
-    linalg::GetCollapsableDimensionsFn collapseFn =
-        [&](linalg::GenericOp op) -> SmallVector<ReassociationIndices> {
+    linalg::GetCollapsableDimensionsFn collapseFn = [&](linalg::LinalgOp op) {
       SmallVector<ReassociationIndices> collapseIndices;
       SmallVector<unsigned> reductionDims;
       op.getReductionDims(reductionDims);

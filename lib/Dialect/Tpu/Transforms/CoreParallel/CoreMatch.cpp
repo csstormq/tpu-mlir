@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "mlir/Transforms/TopologicalSortUtils.h"
+#include "mlir/Analysis/TopologicalSortUtils.h"
 #include "tpu_mlir/Dialect/Tpu/Transforms/CoreParallel/CoreParallel.hpp"
 #include "tpu_mlir/Support/MathUtils.h"
 #include "tpu_mlir/Support/Module.h"

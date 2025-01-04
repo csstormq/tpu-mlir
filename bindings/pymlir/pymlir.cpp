@@ -65,7 +65,7 @@ void run_pass_pipeline(std::string mlir_txt, std::vector<std::string> opts) {
         continue;
       }
       auto pass_name = opt.substr(2, i - 2);
-      const PassInfo *passInfo = Pass::lookupPassInfo(pass_name);
+      const PassInfo *passInfo = PassInfo::lookup(pass_name);
       if (!passInfo) {
         llvm::errs() << "unknown pass: " << pass_name << "\n";
         continue;
